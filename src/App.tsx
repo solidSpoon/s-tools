@@ -2,13 +2,13 @@ import "./App.css";
 import {cn} from "@/lib/utils.ts";
 import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} from "react-router-dom";
 import Layout from "@/components/layout/layout.tsx";
+import {Toaster} from "react-hot-toast";
+import SplitVideo from "@/pages/split-video.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
-        <Route path="/" element={<Layout/>}>
-            <Route path="split-video" element={<div>
-                <h1>Split Video</h1></div>}
-            />
+        <Route path="/" element={<Layout />}>
+            <Route path="split-video" element={<SplitVideo />}/>
             {/*<Route*/}
             {/*    path="dashboard"*/}
             {/*    element={<div />}*/}
@@ -34,6 +34,7 @@ function App() {
     return (
         <div className={cn('w-full h-screen')}>
             <RouterProvider router={router}/>
+            <Toaster />
         </div>
     );
 }
