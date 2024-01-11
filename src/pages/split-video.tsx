@@ -8,6 +8,24 @@ import { open } from "@tauri-apps/api/dialog"
 import {invoke} from "@tauri-apps/api/tauri";
 import toast from "react-hot-toast";
 
+const PLACEHOLDER = `Edit your timestamp and title here.
+
+eg:
+00:00:00 Intro
+00:01:55 How JWT security works
+00:07:26 Create a new spring boot 3.0 project
+00:09:28 Add Data source
+00:12:28 Connect to the database
+00:17:12 Create user class
+00:20:05 Transform the User to an entity
+00:25:22 Extend the user to UserDeatils object
+00:33:32 Create the user repository
+00:35:50 Create the JWT authentication filter
+00:40:58 Checking the JWT token
+00:44:32 Create the JWT service
+00:47:56 Add the JWT dependencies`
+
+
 const SplitVideo = () => {
     const [files, setFiles] = useState<string[]>([])
     const [text, setText] = useState<string>("")
@@ -36,6 +54,7 @@ const SplitVideo = () => {
         setLoading(false)
     }
 
+
     return (
         <div
             style={{
@@ -50,7 +69,7 @@ const SplitVideo = () => {
                         setText(e.target.value)
                     }}
                     className={cn("w-full h-full resize-none")}
-                    placeholder="Type your message here."
+                    placeholder={PLACEHOLDER}
                 />
             </div>
             <div className={cn("p-2 flex flex-col")}>

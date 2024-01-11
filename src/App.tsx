@@ -4,11 +4,20 @@ import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} fr
 import Layout from "@/components/layout/layout.tsx";
 import {Toaster} from "react-hot-toast";
 import SplitVideo from "@/pages/split-video.tsx";
+import HomePage from "@/pages/home-page.tsx";
+import TitleLayout from "@/components/layout/TitleLayout.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
-        <Route path="/" element={<Layout />}>
-            <Route path="split-video" element={<SplitVideo />}/>
+        <Route element={<Layout/>}>
+            <Route path="/" element={<HomePage/>}/>
+            <Route path="split-video" element={
+                <TitleLayout
+                    title={"Split Video"}
+                    description={"Split video & subtitle by timestamp"}>
+                    <SplitVideo/>
+                </TitleLayout>
+            }/>
             {/*<Route*/}
             {/*    path="dashboard"*/}
             {/*    element={<div />}*/}
@@ -32,9 +41,9 @@ function App() {
     // }
 
     return (
-        <div className={cn('w-full h-screen')}>
+        <div className={cn('w-full h-screen select-none')}>
             <RouterProvider router={router}/>
-            <Toaster />
+            <Toaster/>
         </div>
     );
 }
