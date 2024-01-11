@@ -2,6 +2,8 @@ import {useState} from "react";
 
 import {invoke} from "@tauri-apps/api/tauri";
 import "./App.css";
+import {cn} from "@/lib/utils.ts";
+import { Button } from "./components/ui/button";
 
 function App() {
     const [greetMsg, setGreetMsg] = useState("");
@@ -13,11 +15,10 @@ function App() {
     }
 
     return (
-        <div className="h-full w-full bg-amber-300">
-            <button
+        <div className={cn('w-full h-screen grid place-content-center')}>
+            <Button
                 onClick={greet}
-            >Greet
-            </button>
+                variant="outline">Button</Button>
             <p>{greetMsg}</p>
         </div>
     );
