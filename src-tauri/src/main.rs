@@ -3,8 +3,11 @@
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+async fn greet(name: String) -> Result<String, String> {
+    // sleep 10 seconds to simulate a long running task
+    std::thread::sleep(std::time::Duration::from_secs(10));
+    Ok(format!("Hello, {}! You've been greeted from Rust!", name))
+    // format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
 fn main() {
