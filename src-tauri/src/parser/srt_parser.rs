@@ -6,7 +6,7 @@ use nom::{
     sequence::separated_pair,
     IResult,
 };
-use std::time::Duration;
+use chrono::NaiveTime;
 use nom::bytes::complete::tag;
 
 /// `SubtitleItem` is a structure that represents a subtitle item in an SRT file.
@@ -31,8 +31,8 @@ use nom::bytes::complete::tag;
 #[derive(Debug, PartialEq)]
 pub struct SubtitleItem {
     pub id: u32,
-    pub start: Duration,
-    pub end: Duration,
+    pub start: NaiveTime,
+    pub end: NaiveTime,
     pub content: Vec<String>,
 }
 
@@ -72,7 +72,7 @@ fn is_numeric(c: char) -> bool {
 /// # Errors
 ///
 /// This function will return an error if the input string is not in the correct format or if the parsing of the hours, minutes, seconds or milliseconds fails.
-fn duration(input: &str) -> IResult<&str, Duration> {
+fn duration(input: &str) -> IResult<&str, NaiveTime> {
     let (input, hours) = map_res(take_while(is_numeric), |s: &str| s.parse::<u64>())(input)?;
     let (input, _) = char(':')(input)?;
     let (input, minutes) = map_res(take_while(is_numeric), |s: &str| s.parse::<u64>())(input)?;
@@ -80,7 +80,8 @@ fn duration(input: &str) -> IResult<&str, Duration> {
     let (input, seconds) = map_res(take_while(is_numeric), |s: &str| s.parse::<u64>())(input)?;
     let (input, _) = char(',')(input)?;
     let (input, millis) = map_res(take_while(is_numeric), |s: &str| s.parse::<u64>())(input)?;
-    Ok((input, Duration::from_secs(hours * 60 * 60 + minutes * 60 + seconds) + Duration::from_millis(millis)))
+    let time = NaiveTime::from_hms_milli_opt(hours as u32, minutes as u32, seconds as u32, millis as u32).unwrap();
+    Ok((input, time))
 }
 fn subtitle_item(input: &str) -> IResult<&str, SubtitleItem> {
     let (input, id) = map_res(take_while(is_numeric), |s: &str| s.parse::<u32>())(input)?;

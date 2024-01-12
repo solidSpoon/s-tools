@@ -6,12 +6,13 @@ use nom::{
     sequence::terminated,
     IResult,
 };
-use std::time::Duration;
+use chrono::NaiveTime;
 
 #[derive(Debug, PartialEq)]
 pub struct Timestamp {
-    pub start: Duration,
-    pub end: Option<Duration>,
+    pub index: u32,
+    pub start: NaiveTime,
+    pub end: Option<NaiveTime>,
     pub title: String,
 }
 
@@ -51,13 +52,14 @@ fn is_numeric(c: char) -> bool {
 /// # Errors
 ///
 /// This function will return an error if the input string is not in the correct format or if the parsing of the hours, minutes, seconds or milliseconds fails.
-fn duration(input: &str) -> IResult<&str, Duration> {
+fn duration(input: &str) -> IResult<&str, NaiveTime> {
     let (input, hours) = map_res(take_while(is_numeric), |s: &str| s.parse::<u64>())(input)?;
     let (input, _) = char(':')(input)?;
     let (input, minutes) = map_res(take_while(is_numeric), |s: &str| s.parse::<u64>())(input)?;
     let (input, _) = char(':')(input)?;
     let (input, seconds) = map_res(take_while(is_numeric), |s: &str| s.parse::<u64>())(input)?;
-    Ok((input, Duration::from_secs(hours * 60 * 60 + minutes * 60 + seconds)))
+    let time = NaiveTime::from_hms_opt(hours as u32, minutes as u32, seconds as u32).unwrap();
+    return Ok((input, time));
 }
 fn timestamp_item(input: &str) -> IResult<&str, Timestamp> {
     let (input, timestamp) = terminated(duration, multispace1)(input)?;
@@ -65,6 +67,7 @@ fn timestamp_item(input: &str) -> IResult<&str, Timestamp> {
     Ok((
         input,
         Timestamp {
+            index: 0,
             start: timestamp,
             end: None,
             title: title.to_string(),
@@ -77,22 +80,25 @@ fn parse_timestamps(input: &str) -> IResult<&str, Vec<Timestamp>> {
     separated_list1(multispace1, timestamp_item)(input)
 }
 
-fn process_timestamps(input: &str) -> Vec<Timestamp> {
-    let mut timestamps = parse_timestamps(input).unwrap().1;
-    let mut prev_timestamp = None;
-    for timestamp in timestamps.iter_mut() {
-        if let Some(prev_timestamp) = prev_timestamp {
-            prev_timestamp.end = Some(timestamp.start);
+fn process_timestamps(timestamps: &mut Vec<Timestamp>)  {
+    let start_times: Vec<_> = timestamps.iter().map(|t| t.start).collect();
+    let len = timestamps.len();
+    for (index, timestamp) in timestamps.iter_mut().enumerate() {
+        timestamp.index = (index + 1) as u32;
+        if index < len - 1 {
+            timestamp.end = Some(start_times[index + 1]);
         }
-        prev_timestamp = Some(timestamp);
     }
-    timestamps
 }
 
 pub fn parse(input: &str) -> anyhow::Result<Vec<Timestamp>> {
     let result = parse_timestamps(input);
     match result {
-        Ok(timestamps) => Ok(timestamps),
-        Err(e) => Err(anyhow::anyhow!("parse timestamp failed! {}", e)),
+        Ok((_, timestamps)) => {
+            let mut timestamps = timestamps;
+            process_timestamps(&mut timestamps);
+            Ok(timestamps)
+        },
+        Err(e) => Err(anyhow::anyhow!("Error parsing timestamps: {:?}", e)),
     }
 }

@@ -3,6 +3,7 @@
 
 mod split_video;
 mod parser;
+mod util;
 
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
