@@ -6,14 +6,6 @@ mod timestamp_parser;
 mod srt_parser;
 mod file_parser;
 
-pub fn parse_timestamp(input: &str) -> anyhow::Result<Vec<Timestamp>> {
-    timestamp_parser::parse(input)
-}
-
-pub fn parse_srt(input: &str) -> anyhow::Result<Vec<SubtitleItem>> {
-    srt_parser::parse(input)
-}
-
-pub fn parse_path(path_str: &str) -> FileHolder {
-    file_parser::parse(path_str)
-}
+pub use timestamp_parser::parse as parse_timestamp;
+pub use srt_parser::parse as parse_srt;
+pub use file_parser::parse as parse_path;

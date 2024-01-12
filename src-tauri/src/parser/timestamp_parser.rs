@@ -8,6 +8,24 @@ use nom::{
 };
 use chrono::NaiveTime;
 
+/// The `Timestamp` struct represents a segment in a video file.
+///
+/// It contains the following fields:
+/// - `index`: A unique identifier for each segment. It is a 32-bit unsigned integer.
+/// - `start`: The start time of the segment. It is represented as a `NaiveTime` object.
+/// - `end`: The end time of the segment. It is represented as an `Option<NaiveTime>` object. This field is optional and can be `None`. If it is `None`, it means that the segment extends to the start time of the next segment or to the end of the video if there is no next segment.
+/// - `title`: The title of the segment. It is a `String`.
+///
+/// # Examples
+///
+/// ```
+/// let timestamp = Timestamp {
+///     index: 1,
+///     start: NaiveTime::from_hms(0, 0, 0),
+///     end: Some(NaiveTime::from_hms(0, 1, 55)),
+///     title: "Intro".to_string(),
+/// };
+/// ```
 #[derive(Debug, PartialEq)]
 pub struct Timestamp {
     pub index: u32,
@@ -91,6 +109,25 @@ fn process_timestamps(timestamps: &mut Vec<Timestamp>)  {
     }
 }
 
+/// Parses a string of timestamps into a vector of `Timestamp` structs.
+///
+/// This function takes a string of timestamps as input and attempts to parse it into a vector of `Timestamp` structs.
+/// Each timestamp in the input string should be in the format "HH:MM:SS,mmm" and separated by whitespace.
+/// The function first calls `parse_timestamps` to parse the input string into a vector of `Timestamp` structs.
+/// Then it calls `process_timestamps` to process the parsed timestamps, setting the `index` and `end` fields for each `Timestamp`.
+///
+/// # Arguments
+///
+/// * `input` - A string slice that holds the timestamps.
+///
+/// # Returns
+///
+/// This function returns a `Result` which is an `Ok` if the parsing and processing is successful. The `Ok` variant wraps a vector of `Timestamp` structs.
+/// If the parsing or processing is unsuccessful, it returns an `Err` variant wrapping an `anyhow::Error` instance.
+///
+/// # Errors
+///
+/// This function will return an error if the input string is not in the correct format or if the parsing or processing of the timestamps fails.
 pub fn parse(input: &str) -> anyhow::Result<Vec<Timestamp>> {
     let result = parse_timestamps(input);
     match result {
