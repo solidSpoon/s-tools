@@ -1,8 +1,5 @@
-use regex::Regex;
 use anyhow::{Context, Result};
-use std::io::BufRead;
 use std::path::PathBuf;
-use chrono::NaiveTime;
 use crate::parser::{FileHolder, FileType, parse_path, parse_timestamp, Timestamp};
 use crate::util::escape_special_chars;
 
@@ -20,43 +17,6 @@ fn split_one_file(file_holder: &FileHolder, time_stamps: &Vec<Timestamp>) -> Res
         split_video(file_holder, time_stamp)?;
     }
     Ok(())
-}
-
-
-impl FileHolder {
-    fn new(file_path: &str) -> FileHolder {
-        let full_path = file_path.to_string();
-        let name = file_path.split("/").last().unwrap().to_string();
-        let directory = file_path.replace(&name, "");
-        let file_type = match name.split(".").last().unwrap() {
-            "mp4" => FileType::Video,
-            "srt" => FileType::Subtitle,
-            _ => FileType::None,
-        };
-        FileHolder {
-            full_path,
-            name,
-            directory,
-            file_type,
-        }
-    }
-}
-
-
-struct Line {
-    time: NaiveTime,
-    name: String,
-}
-
-impl Line {
-    fn from(line: &str) -> Line {
-        println!("line: {}", line);
-        let re = Regex::new(r"^(\d{2}:\d{2}:\d{2})\s+(.*)$").unwrap();
-        let caps = re.captures(line).unwrap();
-        let time = NaiveTime::parse_from_str(&caps[1], "%H:%M:%S").unwrap();
-        let name = caps[2].to_string();
-        Line { time, name }
-    }
 }
 
 fn split_video(file_holder: &FileHolder, time_stamp: &Timestamp) -> Result<()> {
